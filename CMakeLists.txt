@@ -1,25 +1,20 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.14)
 
 # setup directory where we should look for cmake files
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-option(HUNTER_ENABLED "Enable Hunter package manager" NO)
-include(HunterGate)
-HunterGate(
-	URL "https://github.com/ruslo/hunter/archive/v0.18.47.tar.gz"
-	SHA1 "f0c476a3a0f9edd6182936d8c4460811f112189c"
-)
+# option(HUNTER_ENABLED "Enable Hunter package manager" NO)
+# include(HunterGate)
+# HunterGate(
+# 	URL "https://github.com/ruslo/hunter/archive/v0.18.47.tar.gz"
+# 	SHA1 "f0c476a3a0f9edd6182936d8c4460811f112189c"
+# )
 
 project(libjson-rpc-cpp)
 
 # list command no longer ignores empty elements
 cmake_policy(SET CMP0007 NEW)
 cmake_policy(SET CMP0012 NEW)
-
-if (${CMAKE_MAJOR_VERSION} GREATER 2)
-    # old policy do not use MACOSX_RPATH
-    cmake_policy(SET CMP0042 OLD)
-endif()
 
 set(MAJOR_VERSION 1)
 set(MINOR_VERSION 4)
@@ -86,13 +81,13 @@ include(CMakeDependencies)
 include(GNUInstallDirs)
 
 # setup output directories
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # setup global include_directories (for backwards compatibility)
-include_directories("${CMAKE_BINARY_DIR}/gen/")
-include_directories("${CMAKE_BINARY_DIR}/gen/jsonrpccpp/common")
+# include_directories("${CMAKE_BINARY_DIR}/gen/")
+# include_directories("${CMAKE_BINARY_DIR}/gen/jsonrpccpp/common")
 
 # the core framework
 add_subdirectory(src/jsonrpccpp)
@@ -122,41 +117,41 @@ if (DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 # setup uninstall target
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY
-)
+# configure_file(
+#     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+#     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+#     IMMEDIATE @ONLY
+# )
 
-add_custom_target(
-    uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
-)
+# add_custom_target(
+#     uninstall
+#     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+# )
 
-# CMake package
-set(package_name "libjson-rpc-cpp")
-include(CMakePackageConfigHelpers)
-set(config_install_destination ${CMAKE_INSTALL_LIBDIR}/${package_name}/cmake)
-configure_package_config_file(
-	cmake/${package_name}Config.cmake.in ${package_name}Config.cmake
-	INSTALL_DESTINATION ${config_install_destination}
-)
-write_basic_package_version_file(
-	${package_name}ConfigVersion.cmake
-	VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
-	COMPATIBILITY ExactVersion
-)
-install(
-	EXPORT ${package_name}Targets
-	DESTINATION ${config_install_destination}
-	NAMESPACE ${package_name}::
-)
-install(
-	FILES
-	${CMAKE_CURRENT_BINARY_DIR}/${package_name}Config.cmake
-	${CMAKE_CURRENT_BINARY_DIR}/${package_name}ConfigVersion.cmake
-	DESTINATION ${config_install_destination}
-)
+# # CMake package
+# set(package_name "libjson-rpc-cpp")
+# include(CMakePackageConfigHelpers)
+# set(config_install_destination ${CMAKE_INSTALL_LIBDIR}/${package_name}/cmake)
+# configure_package_config_file(
+# 	cmake/${package_name}Config.cmake.in ${package_name}Config.cmake
+# 	INSTALL_DESTINATION ${config_install_destination}
+# )
+# write_basic_package_version_file(
+# 	${package_name}ConfigVersion.cmake
+# 	VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+# 	COMPATIBILITY ExactVersion
+# )
+# install(
+# 	EXPORT ${package_name}Targets
+# 	DESTINATION ${config_install_destination}
+# 	NAMESPACE ${package_name}::
+# )
+# install(
+# 	FILES
+# 	${CMAKE_CURRENT_BINARY_DIR}/${package_name}Config.cmake
+# 	${CMAKE_CURRENT_BINARY_DIR}/${package_name}ConfigVersion.cmake
+# 	DESTINATION ${config_install_destination}
+# )
 
-# packaging stuff
-include(CMakePackaging)
+# # packaging stuff
+# include(CMakePackaging)

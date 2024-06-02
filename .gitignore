@@ -57,3 +57,6 @@ lib
 gen
 win32-deps
 **/*.dir/*
+
+# conan
+*Presets.json

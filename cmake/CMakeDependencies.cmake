@@ -7,16 +7,10 @@
 # set default dependencies search path
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_SOURCE_DIR}/win32-deps")
 
-find_package(Jsoncpp REQUIRED)
-message(STATUS "Jsoncpp header: ${JSONCPP_INCLUDE_DIR}")
-message(STATUS "Jsoncpp lib   : ${JSONCPP_LIBRARY}")
-include_directories(${JSONCPP_INCLUDE_DIR})
-include_directories(${JSONCPP_INCLUDE_DIR}/jsoncpp)
-
 if(${COMPILE_STUBGEN})
-    find_package(Argtable REQUIRED)
-    message(STATUS "Argtable header: ${ARGTABLE_INCLUDE_DIRS}")
-    message(STATUS "Argtable lib   : ${ARGTABLE_LIBRARIES}")
+    find_package(argtable2 REQUIRED CONFIG)
+    # message(STATUS "Argtable header: ${ARGTABLE_INCLUDE_DIRS}")
+    # message(STATUS "Argtable lib   : ${ARGTABLE_LIBRARIES}")
 endif()
 
 if(${HTTP_CLIENT})
@@ -27,9 +21,9 @@ if(${HTTP_CLIENT})
 endif()
 
 if (${HTTP_SERVER})
-    find_package(MHD REQUIRED)
-    message(STATUS "MHD header: ${MHD_INCLUDE_DIRS}")
-    message(STATUS "MHD lib   : ${MHD_LIBRARIES}")
+    find_package(libmicrohttpd REQUIRED)
+    # message(STATUS "MHD header: ${MHD_INCLUDE_DIRS}")
+    # message(STATUS "MHD lib   : ${MHD_LIBRARIES}")
 endif()
 
 if (${REDIS_SERVER} OR ${REDIS_CLIENT})

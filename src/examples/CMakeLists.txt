@@ -1,8 +1,8 @@
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/gen)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/example)
 
 add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/gen/abstractstubserver.h
-        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-server=AbstractStubServer --cpp-server-file=${CMAKE_BINARY_DIR}/gen/abstractstubserver.h
+        OUTPUT ${CMAKE_BINARY_DIR}/include/example/abstractstubserver.h
+        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-server=AbstractStubServer --cpp-server-file=${CMAKE_BINARY_DIR}/include/example/abstractstubserver.h
         MAIN_DEPENDENCY spec.json
         DEPENDS jsonrpcstub
         COMMENT "Generating Server Stubfiles"
@@ -10,8 +10,8 @@ add_custom_command(
 )
 
 add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/gen/stubclient.h
-        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-client=StubClient --cpp-client-file=${CMAKE_BINARY_DIR}/gen/stubclient.h
+        OUTPUT ${CMAKE_BINARY_DIR}/include/example/stubclient.h
+        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-client=StubClient --cpp-client-file=${CMAKE_BINARY_DIR}/include/example/stubclient.h
         MAIN_DEPENDENCY spec.json
         DEPENDS jsonrpcstub
         COMMENT "Generating Client Stubfile"
@@ -19,12 +19,12 @@ add_custom_command(
 )
 
 add_custom_target(common_stubs
-        DEPENDS ${CMAKE_BINARY_DIR}/gen/abstractstubserver.h ${CMAKE_BINARY_DIR}/gen/stubclient.h
+        DEPENDS ${CMAKE_BINARY_DIR}/include/example/abstractstubserver.h ${CMAKE_BINARY_DIR}/include/example/stubclient.h
         )
 
 add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/gen/xbmcremote.h
-        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/xbmc_remote.json --cpp-client=XbmcRemoteClient --cpp-client-file=${CMAKE_BINARY_DIR}/gen/xbmcremote.h
+        OUTPUT ${CMAKE_BINARY_DIR}/include/example/xbmcremote.h
+        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/xbmc_remote.json --cpp-client=XbmcRemoteClient --cpp-client-file=${CMAKE_BINARY_DIR}/include/example/xbmcremote.h
         MAIN_DEPENDENCY xbmc_remote.json
         DEPENDS jsonrpcstub
         COMMENT "Generating Client XBMC Stubfile"
@@ -87,15 +87,21 @@ endif ()
 
 if (COMPILE_STUBGEN)
     if (HTTP_CLIENT)
-        add_executable(stubclientsample stubclient.cpp ${CMAKE_BINARY_DIR}/gen/stubclient.h)
+        add_executable(stubclientsample stubclient.cpp)
+        target_include_directories(stubclientsample PRIVATE ${CMAKE_BINARY_DIR}/include/example)
         target_link_libraries(stubclientsample jsonrpcclient)
-        add_executable(xbmcremote xbmcremote.cpp ${CMAKE_BINARY_DIR}/gen/xbmcremote.h)
+        add_dependencies(stubclientsample common_stubs)
+
+        add_executable(xbmcremote xbmcremote.cpp ${CMAKE_BINARY_DIR}/include/example/xbmcremote.h)
+        target_include_directories(xbmcremote PRIVATE ${CMAKE_BINARY_DIR}/include/example)
         target_link_libraries(xbmcremote jsonrpcclient)
     endif ()
 
     if (HTTP_SERVER)
-        add_executable(stubserversample stubserver.cpp ${CMAKE_BINARY_DIR}/gen/abstractstubserver.h)
+        add_executable(stubserversample stubserver.cpp)
+        target_include_directories(stubserversample PRIVATE ${CMAKE_BINARY_DIR}/include/example)
         target_link_libraries(stubserversample jsonrpcserver)
+        add_dependencies(stubserversample common_stubs)
     endif ()
 endif ()
 

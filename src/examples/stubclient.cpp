@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "gen/stubclient.h"
+#include "stubclient.h"
 #include <jsonrpccpp/client/connectors/httpclient.h>
 
 using namespace jsonrpc;

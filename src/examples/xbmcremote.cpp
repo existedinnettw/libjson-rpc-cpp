@@ -7,7 +7,7 @@
  * @license See attached LICENSE.txt
  ************************************************************************/
 
-#include "gen/xbmcremote.h"
+#include "xbmcremote.h"
 #include <jsonrpccpp/client/connectors/httpclient.h>
 
 #include <stdio.h>

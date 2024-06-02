@@ -8,7 +8,7 @@
  ************************************************************************/
 #include <iostream>
 
-#include "gen/abstractstubserver.h"
+#include "abstractstubserver.h"
 #include <jsonrpccpp/server/connectors/httpserver.h>
 #include <stdio.h>
 
