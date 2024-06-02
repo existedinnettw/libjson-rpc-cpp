@@ -16,13 +16,15 @@ class LibJsonRPCCPPConan(ConanFile):
         "fPIC": [True, False],
         "with_http_client": [True, False],
         "with_http_server": [True, False],
+        "with_redis": [True, False],
         "build_examples": [True, False],
     }
     default_options = {
         "shared": True,
         "fPIC": True,
-        "with_http_client": False,
-        "with_http_server": False,
+        "with_http_client": True,
+        "with_http_server": True,
+        "with_redis": False,
         "build_examples": False,
     }
     exports_sources = ["CMakeLists.txt", "cmake.patch"]
@@ -44,6 +46,8 @@ class LibJsonRPCCPPConan(ConanFile):
             self.requires("libcurl/[~8.6]")
         if self.options.with_http_server:
             self.requires("libmicrohttpd/[~0.9]")
+        if self.options.with_redis:
+            self.requires("hiredis/[~1]")
 
     def layout(self):
         cmake_layout(self)
@@ -60,10 +64,8 @@ class LibJsonRPCCPPConan(ConanFile):
         else:
             tc.variables["COMPILE_TESTS"] = False
         tc.variables["COMPILE_STUBGEN"] = True
-        # TODO (uilian): Hiredis
-        tc.variables["REDIS_SERVER"] = False
-        # TODO (uilian): Hiredis
-        tc.variables["REDIS_CLIENT"] = False
+        tc.variables["REDIS_SERVER"] = self.options.with_redis
+        tc.variables["REDIS_CLIENT"] = self.options.with_redis
         tc.variables["HTTP_SERVER"] = self.options.with_http_server
         tc.variables["HTTP_CLIENT"] = self.options.with_http_client
         tc.variables["TCP_SOCKET_SERVER"] = True

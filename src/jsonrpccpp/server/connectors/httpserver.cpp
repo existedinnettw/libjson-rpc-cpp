@@ -81,18 +81,18 @@ bool HttpServer::StartListening() {
         // std::cout << "[DEBUG] path_sslkey: " << this->path_sslkey << ", sslkey: \n" << this->sslkey << "\n";
 
         // conan libmicrohttpd may not support gnutls, you may modify recipe in cci.
-        this->daemon = MHD_start_daemon(MHD_USE_TLS | mhd_flags, this->port, NULL, NULL, HttpServer::callback, this,
-                                        MHD_OPTION_HTTPS_MEM_KEY, this->sslkey.c_str(), MHD_OPTION_HTTPS_MEM_CERT, this->sslcert.c_str(),
-                                        MHD_OPTION_THREAD_POOL_SIZE, this->threads, MHD_OPTION_END); // bug here.
+        this->daemon =
+            MHD_start_daemon(MHD_USE_TLS | mhd_flags, this->port, NULL, NULL, HttpServer::callback, this, MHD_OPTION_HTTPS_MEM_KEY, this->sslkey.c_str(),
+                             MHD_OPTION_HTTPS_MEM_CERT, this->sslcert.c_str(), MHD_OPTION_THREAD_POOL_SIZE, this->threads, MHD_OPTION_END); // bug here.
       } catch (JsonRpcException &ex) {
-        std::cout << "JsonRpcException/" << ex.what() << ":" << ex.GetMessage() << "\n";
+        std::cout << "JsonRpcException/" << ex.what() << "\n";
         return false;
       }
     } else {
       this->daemon =
           MHD_start_daemon(mhd_flags, this->port, NULL, NULL, HttpServer::callback, this, MHD_OPTION_THREAD_POOL_SIZE, this->threads, MHD_OPTION_END);
     }
-    
+
     if (this->daemon != NULL)
       this->running = true;
     else {

@@ -33,6 +33,8 @@ namespace jsonrpc {
     /**
      * This method will kill the redis server when we are done with it.
      * @return true on success, false for failure.
+     * @attention
+     * The method work iff you can kill the redis server (not daemon).
      */
     bool Stop();
 

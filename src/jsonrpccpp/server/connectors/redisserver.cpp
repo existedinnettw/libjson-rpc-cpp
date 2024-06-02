@@ -82,7 +82,7 @@ bool RedisServer::StopListening() {
   if (!this->running) {
     return true;
   }
-  this->running = false;
+  this->running = false; // stop listening_thread
   pthread_join(this->listenning_thread, NULL);
   if (con != NULL) {
     redisFree(con);

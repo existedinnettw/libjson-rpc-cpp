@@ -5,6 +5,8 @@ file(GLOB_RECURSE test_source *.cpp)
 include_directories(..)
 include_directories(${CMAKE_BINARY_DIR})
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/test)
+
 add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/include/test/abstractstubserver.h
         COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-server=AbstractStubServer --cpp-server-file=${CMAKE_BINARY_DIR}/include/test/abstractstubserver.h
@@ -63,7 +65,9 @@ endif ()
 
 add_executable(unit_testsuite ${test_source})
 if (COMPILE_STUBGEN)
+    #should include stubclient, abstractstubserver.h
     target_include_directories(unit_testsuite PRIVATE "${CMAKE_BINARY_DIR}/include/test")
+    target_sources(unit_testsuite PRIVATE "${CMAKE_BINARY_DIR}/include/test/abstractstubserver.h" "${CMAKE_BINARY_DIR}/include/test/stubclient.h")
 endif()
 target_link_libraries(unit_testsuite jsonrpccommon)
 target_link_libraries(unit_testsuite jsonrpcserver)

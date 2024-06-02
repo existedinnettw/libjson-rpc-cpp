@@ -9,8 +9,6 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_SOURCE_DIR}/win32-deps")
 
 if(${COMPILE_STUBGEN})
     find_package(argtable2 REQUIRED CONFIG)
-    # message(STATUS "Argtable header: ${ARGTABLE_INCLUDE_DIRS}")
-    # message(STATUS "Argtable lib   : ${ARGTABLE_LIBRARIES}")
 endif()
 
 if(${HTTP_CLIENT})
@@ -22,14 +20,10 @@ endif()
 
 if (${HTTP_SERVER})
     find_package(libmicrohttpd REQUIRED)
-    # message(STATUS "MHD header: ${MHD_INCLUDE_DIRS}")
-    # message(STATUS "MHD lib   : ${MHD_LIBRARIES}")
 endif()
 
 if (${REDIS_SERVER} OR ${REDIS_CLIENT})
-    find_package(Hiredis REQUIRED)
-    message(STATUS "Hiredis header: ${HIREDIS_INCLUDE_DIRS}")
-    message(STATUS "Hiredis lib   : ${HIREDIS_LIBRARIES}")
+    find_package(hiredis REQUIRED)
 endif()
 
 find_package(Threads REQUIRED)

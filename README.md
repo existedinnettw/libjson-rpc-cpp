@@ -72,10 +72,10 @@ brew install libjson-rpc-cpp
 There is a ready to use compiled package [here](http://spiessknafl.at/libjson-rpc-cpp).
 Just download execute the installer EXE.
 
-Build from source
-=================
-Install the dependencies
-------------------------
+# Build from source
+
+## Install the dependencies
+
 - [libcurl](http://curl.haxx.se/)
 - [libmicrohttpd](http://www.gnu.org/software/libmicrohttpd/)
 - [libjsoncpp](https://github.com/open-source-parsers/jsoncpp)
@@ -125,8 +125,16 @@ Default configuration should be fine for most systems, but here are available co
 - `-DTCP_SOCKET_SERVER=NO` disable the tcp socket server connector.
 - `-DTCP_SOCKET_CLIENT=NO` disable the tcp socket client connector.
 
-Using the framework
-===================
+## conan
+
+- libmicrohttpd recipe at conan center may not support tls yet, you may require to modify and install libmicrohttpd.
+
+## test
+
+To run `RedisServer` unittest, you have to install `redis-server`. e.g. `sudo apt install redis-server`. `redis-server -h` is an easy method to check installed correctly.
+
+# Using the framework
+
 This example will show the most simple way to create a rpc server and client. If you only need the server, ignore step 4. If you only need the client, ignore step 3. You can find all resources of this sample in the `src/examples` directory of this repository.
 
 ### Step 1: Writing the specification file ###
