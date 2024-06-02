@@ -139,31 +139,29 @@ if (FILE_DESCRIPTOR_CLIENT)
 endif ()
 
 # configure a header file to pass some of the CMake settings to the source code
-# file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/gen/jsonrpccpp/common")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.h.in" "${CMAKE_BINARY_DIR}/include/jsonrpccpp/version.h" @ONLY)
-# configure_file("${PROJECT_SOURCE_DIR}/src/jsonrpccpp/common/jsonparser.h.in" "${CMAKE_BINARY_DIR}/gen/jsonrpccpp/common/jsonparser.h")
-
-# install(FILES "${CMAKE_BINARY_DIR}/gen/jsonrpccpp/version.h" DESTINATION include/jsonrpccpp)
-# install(FILES "${PROJECT_BINARY_DIR}/gen/jsonrpccpp/common/jsonparser.h" DESTINATION include/jsonrpccpp/common)
 
 # include required directories
 include_directories(..)
-include_directories(${MHD_INCLUDE_DIRS})
 
 # setup shared common library
 find_package(jsoncpp REQUIRED CONFIG)
+
+
+add_library(jsonrpc INTERFACE ${jsonrpc_header})
+
 if (BUILD_SHARED_LIBS)
-    add_library(jsonrpccommon SHARED ${jsonrpc_source_common} ${jsonrpc_header} ${jsonrpc_helper_source_common})
+    add_library(jsonrpccommon SHARED ${jsonrpc_source_common} ${jsonrpc_helper_source_common})
     target_include_directories(jsonrpccommon PUBLIC ${CMAKE_BINARY_DIR}/include)
-    target_link_libraries(jsonrpccommon JsonCpp::JsonCpp)
+    target_link_libraries(jsonrpccommon PUBLIC JsonCpp::JsonCpp jsonrpc)
     set_target_properties(jsonrpccommon PROPERTIES OUTPUT_NAME jsonrpccpp-common)
 endif ()
 
 # setup static common library
 if (BUILD_STATIC_LIBS OR MSVC)
-    add_library(common STATIC ${jsonrpc_source_common} ${jsonrpc_header} ${jsonrpc_helper_source_common})
+    add_library(common STATIC ${jsonrpc_source_common} ${jsonrpc_helper_source_common})
     target_include_directories(common PUBLIC ${CMAKE_BINARY_DIR}/include)
-    target_link_libraries(common jsoncpp_lib_static)
+    target_link_libraries(common PUBLIC JsonCpp::JsonCpp jsonrpc)
     set_target_properties(common PROPERTIES OUTPUT_NAME jsonrpccpp-common)
 
     if (NOT BUILD_SHARED_LIBS)
@@ -171,18 +169,23 @@ if (BUILD_STATIC_LIBS OR MSVC)
     endif ()
 endif ()
 
+
+
+add_library(jsonrpcclientconnector INTERFACE)
+target_sources(jsonrpcclientconnector INTERFACE ${client_connector_source})
+
 # setup shared client library
 if (BUILD_SHARED_LIBS)
-    add_library(jsonrpcclient SHARED ${jsonrpc_source_client} ${jsonrpc_header} ${jsonrpc_header_client} ${client_connector_source})
+    add_library(jsonrpcclient SHARED ${jsonrpc_source_client} ${jsonrpc_header_client})
     add_dependencies(jsonrpcclient jsonrpccommon)
-    target_link_libraries(jsonrpcclient jsonrpccommon ${client_connector_libs})
+    target_link_libraries(jsonrpcclient jsonrpccommon ${client_connector_libs} jsonrpcclientconnector)
     set_target_properties(jsonrpcclient PROPERTIES OUTPUT_NAME jsonrpccpp-client)
 endif ()
 
 # setup static client library
 if (BUILD_STATIC_LIBS OR MSVC)
-    add_library(client STATIC ${jsonrpc_source_client} ${jsonrpc_header} ${jsonrpc_header_client} ${client_connector_source})
-    target_link_libraries(client common ${client_connector_libs})
+    add_library(client STATIC ${jsonrpc_source_client} ${jsonrpc_header_client})
+    target_link_libraries(client common ${client_connector_libs} jsonrpcclientconnector)
     set_target_properties(client PROPERTIES OUTPUT_NAME jsonrpccpp-client)
 
     if (NOT BUILD_SHARED_LIBS)
@@ -190,51 +193,91 @@ if (BUILD_STATIC_LIBS OR MSVC)
     endif ()
 endif ()
 
+
+add_library(jsonrpcserverconnector INTERFACE)
+target_sources(jsonrpcserverconnector INTERFACE ${server_connector_source})
+
 # setup shared server library
 if (BUILD_SHARED_LIBS)
-    add_library(jsonrpcserver SHARED ${jsonrpc_source_server} ${jsonrpc_header} ${jsonrpc_header_server} ${server_connector_source})
+    add_library(jsonrpcserver SHARED ${jsonrpc_source_server} ${jsonrpc_header_server})
     add_dependencies(jsonrpcserver jsonrpccommon)
-    target_link_libraries(jsonrpcserver jsonrpccommon ${server_connector_libs})
+    target_link_libraries(jsonrpcserver jsonrpccommon ${server_connector_libs} jsonrpcserverconnector)
+    # target_include_directories(jsonrpcserver PUBLIC ${CMAKE_BINARY_DIR}/include)
     set_target_properties(jsonrpcserver PROPERTIES OUTPUT_NAME jsonrpccpp-server)
 endif ()
 
 # setup static server library
 if (BUILD_STATIC_LIBS OR MSVC)
-    add_library(server STATIC ${jsonrpc_source_server} ${jsonrpc_header} ${jsonrpc_header_server} ${server_connector_source})
-    # target_include_directories(server PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/server>)
-    target_link_libraries(server common ${server_connector_libs})
+    add_library(server STATIC ${jsonrpc_source_server} ${jsonrpc_header_server})
+    target_link_libraries(server common ${server_connector_libs} jsonrpcserverconnector)
     set_target_properties(server PROPERTIES OUTPUT_NAME jsonrpccpp-server)
-
+    # target_include_directories(server PUBLIC ${CMAKE_BINARY_DIR}/include)
     if (NOT BUILD_SHARED_LIBS)
         add_library(jsonrpcserver ALIAS server)
     endif ()
 endif ()
 
-set(ALL_LIBS)
-
-if (BUILD_SHARED_LIBS OR NOT BUILD_STATIC_LIBS)
-    list(APPEND ALL_LIBS jsonrpccommon jsonrpcclient jsonrpcserver)
-endif ()
-
-if (BUILD_STATIC_LIBS OR MSVC)
-    list(APPEND ALL_LIBS common client server)
-endif ()
-
 # setup version
 set(VERSION_STRING ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION})
+
 set_target_properties(
-        ${ALL_LIBS}
-        PROPERTIES VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+    jsonrpc
+    PROPERTIES 
+    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+    PUBLIC_HEADER "${jsonrpc_header}"
+)
+install(TARGETS jsonrpc
+    PUBLIC_HEADER DESTINATION include/jsonrpccpp
+)
+set_target_properties(
+    jsonrpccommon
+    PROPERTIES 
+    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+    PUBLIC_HEADER "${jsonrpc_header_common}"
+)
+install(TARGETS jsonrpccommon
+    PUBLIC_HEADER DESTINATION include/jsonrpccpp/common
 )
 
-# install libraries
-# install(FILES ${jsonrpc_header} DESTINATION include/jsonrpccpp)
-# install(FILES ${jsonrpc_header_common} DESTINATION include/jsonrpccpp/common)
-# install(FILES ${jsonrpc_helper_header_common} DESTINATION include/jsonrpccpp/common/helper)
-# install(FILES ${jsonrpc_install_header_client} DESTINATION include/jsonrpccpp/client)
-# install(FILES ${jsonrpc_install_header_server} DESTINATION include/jsonrpccpp/server)
-# install(FILES ${client_connector_header} DESTINATION include/jsonrpccpp/client/connectors)
-# install(FILES ${server_connector_header} DESTINATION include/jsonrpccpp/server/connectors)
+
+set_target_properties(
+    jsonrpcclientconnector
+    PROPERTIES 
+    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+    PUBLIC_HEADER "${client_connector_header}"
+)
+install(TARGETS jsonrpcclientconnector
+    PUBLIC_HEADER DESTINATION include/jsonrpccpp/client/connectors
+)
+set_target_properties(
+    jsonrpcclient
+    PROPERTIES 
+    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+    PUBLIC_HEADER "${jsonrpc_install_header_client}"
+)
+install(TARGETS jsonrpcclient
+    PUBLIC_HEADER DESTINATION include/jsonrpccpp/client
+)
+
+
+set_target_properties(
+    jsonrpcserverconnector
+    PROPERTIES 
+    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+    PUBLIC_HEADER "${server_connector_header}"
+)
+install(TARGETS jsonrpcserverconnector
+    PUBLIC_HEADER DESTINATION include/jsonrpccpp/server/connectors
+)
+set_target_properties(
+    jsonrpcserver
+    PROPERTIES 
+    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+    PUBLIC_HEADER "${jsonrpc_install_header_server}"
+)
+install(TARGETS jsonrpcserver
+    PUBLIC_HEADER DESTINATION include/jsonrpccpp/server
+)
 
 if (WIN32 AND NOT HUNTER_ENABLED)
     # On Windows copy manually installed dependencies unless Hunter is used.
@@ -243,24 +286,3 @@ if (WIN32 AND NOT HUNTER_ENABLED)
     install(FILES ${win32_libs} DESTINATION bin)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/win32-deps/include DESTINATION .)
 endif ()
-
-install(TARGETS ${ALL_LIBS} EXPORT libjson-rpc-cppTargets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION bin
-        )
-
-#set pkg-config
-# get_filename_component(FULL_PATH_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE)
-# set(FULL_PATH_INCLUDEDIR "${FULL_PATH_INSTALL_PREFIX}/include")
-# set(FULL_PATH_LIBDIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-
-# configure_file(${PROJECT_SOURCE_DIR}/cmake/libjsonrpccpp-client.pc.cmake ${CMAKE_BINARY_DIR}/libjsonrpccpp-client.pc)
-# configure_file(${PROJECT_SOURCE_DIR}/cmake/libjsonrpccpp-server.pc.cmake ${CMAKE_BINARY_DIR}/libjsonrpccpp-server.pc)
-# configure_file(${PROJECT_SOURCE_DIR}/cmake/libjsonrpccpp-common.pc.cmake ${CMAKE_BINARY_DIR}/libjsonrpccpp-common.pc)
-
-# INSTALL(FILES
-#         "${CMAKE_BINARY_DIR}/libjsonrpccpp-server.pc"
-#         "${CMAKE_BINARY_DIR}/libjsonrpccpp-client.pc"
-#         "${CMAKE_BINARY_DIR}/libjsonrpccpp-common.pc"
-#         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

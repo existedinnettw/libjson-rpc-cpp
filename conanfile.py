@@ -27,9 +27,7 @@ class LibJsonRPCCPPConan(ConanFile):
         "with_redis": False,
         "build_examples": False,
     }
-    exports_sources = ["CMakeLists.txt", "cmake.patch"]
-    # _source_subfolder = "source_subfolder"
-    # _build_subfolder = "build_subfolder"
+    exports_sources = ["CMakeLists.txt", "cmake/*", "src/*", "doc/*"]
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -41,13 +39,13 @@ class LibJsonRPCCPPConan(ConanFile):
 
     def requirements(self):
         self.requires("argtable2/[~2.13]")  # argtable3 exist
-        self.requires("jsoncpp/[~1.9]")
+        self.requires("jsoncpp/[~1.9]", transitive_headers=True)
         if self.options.with_http_client:
-            self.requires("libcurl/[~8.6]")
+            self.requires("libcurl/[~8.6]", transitive_headers=True)
         if self.options.with_http_server:
-            self.requires("libmicrohttpd/[~0.9]")
+            self.requires("libmicrohttpd/[~0.9]", transitive_headers=True)
         if self.options.with_redis:
-            self.requires("hiredis/[~1]")
+            self.requires("hiredis/[~1]", transitive_headers=True)
 
     def layout(self):
         cmake_layout(self)
@@ -80,27 +78,15 @@ class LibJsonRPCCPPConan(ConanFile):
         if (not self.conf.get("tools.build:skip_test", default=False)) and can_run(
             self
         ):
-            cmake.test()  # TODO COMPILE_TESTS  option
+            cmake.test()
 
     def package(self):
         cmake = CMake(self)
         cmake.install()
-        # self.copy(pattern="LICENSE.txt", dst="licenses", src=self._source_subfolder)
-        # self.copy(
-        #     "*.h",
-        #     src=os.path.join(self._source_subfolder, "src", "jsonrpccpp"),
-        #     dst=os.path.join("include", "jsonrpccpp"),
-        # )
-        # self.copy(
-        #     "*.h",
-        #     src=os.path.join(self._build_subfolder, "gen"),
-        #     dst=os.path.join("include"),
-        # )
-        # self.copy(pattern="*.dll", dst="bin", keep_path=False)
-        # self.copy(pattern="*.lib", dst="lib", keep_path=False)
-        # self.copy(pattern="*.a", dst="lib", keep_path=False)
-        # self.copy(pattern="*.so*", dst="lib", keep_path=False)
-        # self.copy(pattern="*.dylib", dst="lib", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = ["jsoncpp_lib_static"]
+        self.cpp_info.libs = [
+            "jsonrpccpp-common",
+            "jsonrpccpp-client",
+            "jsonrpccpp-server",
+        ]

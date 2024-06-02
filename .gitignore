@@ -60,3 +60,4 @@ win32-deps
 
 # conan
 *Presets.json
+**/build
