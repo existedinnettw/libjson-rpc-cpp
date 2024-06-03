@@ -37,7 +37,7 @@ if (BUILD_STATIC_LIBS AND NOT BUILD_SHARED_LIBS)
 else ()
     target_link_libraries(jsonrpcstub jsonrpccommon libjsonrpcstub)
 endif ()
-#Generate manpage
+# Generate manpage
 if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     configure_file("${CMAKE_SOURCE_DIR}/doc/manpage.in" "${CMAKE_BINARY_DIR}/jsonrpcstub.1" @ONLY)
     add_custom_target(manpage ALL DEPENDS ${CMAKE_BINARY_DIR}/jsonrpcstub.1)
@@ -54,9 +54,4 @@ endif ()
 # install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/stubgenerator/
 #         DESTINATION include/jsonrpccpp/stubgen
 #         FILES_MATCHING PATTERN "*.h")
-
-install(TARGETS ${ALL_LIBS} jsonrpcstub
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION bin
-        )
+install(TARGETS ${ALL_LIBS} jsonrpcstub)

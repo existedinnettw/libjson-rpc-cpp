@@ -1,6 +1,7 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.build import check_min_cppstd, can_run
+import os
 
 
 class LibJsonRPCCPPConan(ConanFile):
@@ -10,6 +11,7 @@ class LibJsonRPCCPPConan(ConanFile):
     homepage = "https://github.com/cinemast/libjson-rpc-cpp"
     url = "http://gitlab.khomp.corp/conan/conan-libjson-rpc-cpp"
     license = "MIT"
+    package_type = "library"
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "shared": [True, False],
@@ -85,6 +87,11 @@ class LibJsonRPCCPPConan(ConanFile):
         cmake.install()
 
     def package_info(self):
+        '''
+        ref
+        ---
+        [Tool requires packages](https://docs.conan.io/2/tutorial/creating_packages/other_types_of_packages/tool_requires_packages.html)
+        '''
         self.cpp_info.libs = [
             "jsonrpccpp-common",
             "jsonrpccpp-client",
