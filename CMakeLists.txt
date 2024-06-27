@@ -53,6 +53,11 @@ set(HTTP_CLIENT YES CACHE BOOL "Include HTTP client support using curl")
 set(COMPILE_TESTS YES CACHE BOOL "Compile test framework")
 set(COMPILE_STUBGEN YES CACHE BOOL "Compile the stubgenerator")
 set(COMPILE_EXAMPLES YES CACHE BOOL "Compile example programs")
+if (CMAKE_CROSSCOMPILING)
+    # following require stubgen to create target, but generated stugen can't run.
+    set(COMPILE_TESTS NO)
+    set(COMPILE_EXAMPLES NO)
+endif()
 
 option(WITH_COVERAGE "Build with code coverage flags" ON)
 

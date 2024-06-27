@@ -230,17 +230,6 @@ install(TARGETS jsonrpc
     PUBLIC_HEADER DESTINATION include/jsonrpccpp
 )
 set_target_properties(
-    jsonrpccommon
-    PROPERTIES 
-    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
-    PUBLIC_HEADER "${jsonrpc_header_common}"
-)
-install(TARGETS jsonrpccommon
-    PUBLIC_HEADER DESTINATION include/jsonrpccpp/common
-)
-
-
-set_target_properties(
     jsonrpcclientconnector
     PROPERTIES 
     VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
@@ -250,17 +239,6 @@ install(TARGETS jsonrpcclientconnector
     PUBLIC_HEADER DESTINATION include/jsonrpccpp/client/connectors
 )
 set_target_properties(
-    jsonrpcclient
-    PROPERTIES 
-    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
-    PUBLIC_HEADER "${jsonrpc_install_header_client}"
-)
-install(TARGETS jsonrpcclient
-    PUBLIC_HEADER DESTINATION include/jsonrpccpp/client
-)
-
-
-set_target_properties(
     jsonrpcserverconnector
     PROPERTIES 
     VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
@@ -269,15 +247,70 @@ set_target_properties(
 install(TARGETS jsonrpcserverconnector
     PUBLIC_HEADER DESTINATION include/jsonrpccpp/server/connectors
 )
-set_target_properties(
-    jsonrpcserver
-    PROPERTIES 
-    VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
-    PUBLIC_HEADER "${jsonrpc_install_header_server}"
-)
-install(TARGETS jsonrpcserver
-    PUBLIC_HEADER DESTINATION include/jsonrpccpp/server
-)
+
+if (BUILD_SHARED_LIBS OR NOT BUILD_STATIC_LIBS)
+    set_target_properties(
+        jsonrpccommon
+        PROPERTIES 
+        VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+        PUBLIC_HEADER "${jsonrpc_header_common}"
+    )
+    install(TARGETS jsonrpccommon
+        PUBLIC_HEADER DESTINATION include/jsonrpccpp/common
+    )
+
+    set_target_properties(
+        jsonrpcclient
+        PROPERTIES 
+        VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+        PUBLIC_HEADER "${jsonrpc_install_header_client}"
+    )
+    install(TARGETS jsonrpcclient
+        PUBLIC_HEADER DESTINATION include/jsonrpccpp/client
+    )
+
+    set_target_properties(
+        jsonrpcserver
+        PROPERTIES 
+        VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+        PUBLIC_HEADER "${jsonrpc_install_header_server}"
+    )
+    install(TARGETS jsonrpcserver
+        PUBLIC_HEADER DESTINATION include/jsonrpccpp/server
+    )
+endif()
+
+if (BUILD_STATIC_LIBS OR MSVC)
+    set_target_properties(
+        common
+        PROPERTIES 
+        VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+        PUBLIC_HEADER "${jsonrpc_header_common}"
+    )
+    install(TARGETS common
+        PUBLIC_HEADER DESTINATION include/jsonrpccpp/common
+    )
+
+    set_target_properties(
+        client
+        PROPERTIES 
+        VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+        PUBLIC_HEADER "${jsonrpc_install_header_client}"
+    )
+    install(TARGETS client
+        PUBLIC_HEADER DESTINATION include/jsonrpccpp/client
+    )
+
+    set_target_properties(
+        server
+        PROPERTIES 
+        VERSION "${VERSION_STRING}" SOVERSION "${SO_VERSION}"
+        PUBLIC_HEADER "${jsonrpc_install_header_server}"
+    )
+    install(TARGETS server
+        PUBLIC_HEADER DESTINATION include/jsonrpccpp/server
+    )
+endif()
 
 if (WIN32 AND NOT HUNTER_ENABLED)
     # On Windows copy manually installed dependencies unless Hunter is used.

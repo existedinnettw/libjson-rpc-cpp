@@ -39,6 +39,9 @@ class LibJsonRPCCPPConan(ConanFile):
         if self.options.shared:
             self.options.rm_safe("fPIC")
 
+        if not can_run(self):
+            self.options.build_examples = False
+
     def requirements(self):
         self.requires("argtable2/[~2.13]")  # argtable3 exist
         self.requires("jsoncpp/[~1.9]", transitive_headers=True)
@@ -80,6 +83,7 @@ class LibJsonRPCCPPConan(ConanFile):
         if (not self.conf.get("tools.build:skip_test", default=False)) and can_run(
             self
         ):
+            # os.chdir(self.build_folder)  # test case rely on file
             cmake.test()
 
     def package(self):
@@ -87,11 +91,11 @@ class LibJsonRPCCPPConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        '''
+        """
         ref
         ---
         [Tool requires packages](https://docs.conan.io/2/tutorial/creating_packages/other_types_of_packages/tool_requires_packages.html)
-        '''
+        """
         self.cpp_info.libs = [
             "jsonrpccpp-common",
             "jsonrpccpp-client",
